@@ -1,0 +1,38 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=354
+
+This is  a sorting function which  takes the name of  an array-like variable
+which ends  in numerical  subscripts along  the lines  of var0,  var1, var2.
+These can be created quite easily with the var{i} notation of Vim 6.
+
+Other parameters are the starting  and ending subscripts (inclusive) and the
+direction of the sort (1 or 'a' for ascending, otherwise descending).
+
+The array is sorted in place; there is no return value from the function.
+
+Optional  argument  is the  name  of  a swap  function  that  takes the  two
+subscripts  and  swaps the  variable  (there  is  one provided  that  should
+actually be good enough for most  cases; however, if something special needs
+to be  done for the swap  -- such as  multiple records, then this  should be
+used.  In this  case, it  is  assumed the  swap function  already knows  the
+variables it's going to swap and thus aren't passed in.)
+
+Sample custom swap function:
+function! MultipleRangeSwap( sub1, sub2 )
+  let temp = b:rangeS{a:sub1}
+  let b:rangeS{a:sub1} = b:rangeS{a:sub2}
+  let b:rangeS{a:sub2} = temp
+
+  let temp = b:rangeE{a:sub1}
+  let b:rangeE{a:sub1} = b:rangeE{a:sub2}
+  let b:rangeE{a:sub2} = temp
+endfunction
+
+Sample call:
+call SortArray( "b:rangeS", 0, b:numRanges - 1, 1, "MultipleRangeSwap" )
+
+This will perform an ascending sort  on a variable sequence named b:rangeS0,
+b:rangeS1 etc.,  using the MultipleRangeSwap  function for the  actual swap.
+This function  was needed here  because two  variables needed to  be swapped
+together  even though  only  one was  used  in the  sort.  The default  swap
+would've only swapped b:rangeS variables, leaving the b:rangeE variables out
+of sync.
